@@ -1,0 +1,15 @@
+{
+	"Storage": {
+		"Dataset": "Ruta fisica donde se almacenan las imagenesque se entrenaron (pendiente)",
+		"Contenedor": "Ruta fisica donde se almacenan las imagenes temporales"
+	},
+	"Keys": {
+		"FaceRecognitionKey": "key de api de Face Recognition de azure",
+		"TelegramBotKey": "key/token de bot de telegram"
+	},
+	"AzureFaceApi": {
+		"GroupId": "Nombre/Id del grupo de la api de face recognition",
+		"Endpoint": "https://[location].api.cognitive.microsoft.com/face/v1.0"
+	},
+	"Admins": [ array de chats ids de telegram ]
+}
