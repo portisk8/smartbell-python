@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+/SmartBell/Development.config.json
+/SmartBell/Include
+/SmartBell/Scripts
+/SmartBell/tcl
+/SmartBell/src/test
+*.sln
+**/*.pyproj
+**/*.pyproj.user
+
