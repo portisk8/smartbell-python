@@ -1,4 +1,5 @@
 {
+	"Environment": "Production",
 	"Storage": {
 		"Dataset": "Ruta fisica donde se almacenan las imagenesque se entrenaron (pendiente)",
 		"Contenedor": "Ruta fisica donde se almacenan las imagenes temporales"
@@ -11,5 +12,5 @@
 		"GroupId": "Nombre/Id del grupo de la api de face recognition",
 		"Endpoint": "https://[location].api.cognitive.microsoft.com/face/v1.0"
 	},
-	"Admins": [ array de chats ids de telegram ]
+	"Admins": [ "array", "de", "chats", "ids", "de", "telegram" ]
 }

@@ -10,6 +10,7 @@ class GeneralConfig(object):
 		cwd = os.path.realpath(os.path.dirname(__file__)).replace("\\src\\Util","")
 		with open(cwd+'\\'+environment+'.config.json') as json_file:  
 			data = json.load(json_file)
+		self.Environment= data["Environment"]
 		self.Dataset = data["Storage"]["Dataset"]
 		self.Contenedor = data["Storage"]["Contenedor"]
 		self.Telegram = TelegramConfig(data["Keys"]["TelegramBotKey"], data['Admins'])

@@ -110,4 +110,4 @@ venv.bak/
 *.sln
 **/*.pyproj
 **/*.pyproj.user
-
+.vs
