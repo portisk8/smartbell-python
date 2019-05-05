@@ -7,8 +7,11 @@ class GeneralConfig(object):
 	"""description of class"""
 
 	def __init__(self,environment):
-		cwd = os.path.realpath(os.path.dirname(__file__)).replace("\\src\\Util","")
-		with open(cwd+'\\'+environment+'.config.json') as json_file:  
+		if os.name == 'nt':
+			cwd = os.path.realpath(os.path.dirname(__file__)).replace("src\\Util","")
+		else:
+			cwd = os.path.realpath(os.path.dirname(__file__)).replace("src/Util","")
+		with open(cwd+environment+'.config.json') as json_file:  
 			data = json.load(json_file)
 		self.Environment= data["Environment"]
 		self.Dataset = data["Storage"]["Dataset"]

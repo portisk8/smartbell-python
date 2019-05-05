@@ -51,7 +51,7 @@ class Camera(object):
 	def take_picture(self):
 		if not self.grabando:
 			self.grabbed, self.frame = self.camera.read()
-		img_name = self.generalConfig.Contenedor + "\\opencv_frame_{}.png".format(self.img_counter)
+		img_name = self.generalConfig.Contenedor + "opencv_frame_{}.png".format(self.img_counter)
 		cv2.imwrite(img_name, self.frame)
 		print("{} written!".format(img_name))
 		self.img_counter += 1

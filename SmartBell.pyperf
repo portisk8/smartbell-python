@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>204b9b01-abbd-40d3-a520-c288d63c06d2</TargetProject>
+    <FriendlyName>SmartBell</FriendlyName>
+  </ProjectTarget>
+  <Reports>
+    <Report>
+      <Filename>C:\Users\Augusto\AppData\Local\Temp\SmartBell_20190422.vsp</Filename>
+    </Report>
+  </Reports>
+  <UseVTune>false</UseVTune>
+</ProfilingTarget>

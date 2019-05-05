@@ -62,8 +62,8 @@ class Bot(object):
 		for adminId in self.generalConfig.Telegram.Admins:
 			try:
 				self.updater.bot.send_photo(chat_id = adminId, photo = open(photoPath, 'rb' ))
-			except :
-			    pass
+			except Exception as ex:
+				print(ex)
 
 	def send_message(self, message):
 		for adminId in self.generalConfig.Telegram.Admins:
