@@ -7,6 +7,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup
 from emoji import emojize
 import logging
+from time import gmtime, strftime
+from datetime import datetime
 
 def getEmoji(type):
 	return emojize(type, use_aliases=True)
@@ -91,8 +93,9 @@ class Bot(object):
 
 	def reconoceStep1(self, bot, update):
 		photo_file = update.message.photo[-1].get_file()
-		photo_file.download(self.generalConfig.Contenedor + "\\photo.png")
-		self.user[update.message.chat_id] = {'photoUrl': self.generalConfig.Contenedor + "\\photo.png"}
+		namePhoto = datetime.now().strftime('%Y%m%d%H%M%S')
+		photo_file.download(self.generalConfig.Contenedor + namePhoto + ".png")
+		self.user[update.message.chat_id] = {'photoUrl': self.generalConfig.Contenedor  + namePhoto + ".png"}
 		update.message.reply_text('Bien! Ahora, debes ingresar el Nombre y Apellido de la persona')
 		return "reconoceStep2"
 
