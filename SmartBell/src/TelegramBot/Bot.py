@@ -9,9 +9,19 @@ from emoji import emojize
 import logging
 from time import gmtime, strftime
 from datetime import datetime
+import threading
+from openal import * 
+import time
 
 def getEmoji(type):
 	return emojize(type, use_aliases=True)
+
+def reproducirAudio(audioPath):
+	source = oalOpen(audioPath)
+	source.play()
+	while source.get_state() == AL_PLAYING:
+		time.sleep(1)
+	oalQuit()
 
 class Bot(object):
 	"""description of class"""
@@ -34,6 +44,9 @@ class Bot(object):
 		take_picture_handler = RegexHandler('^(/takepicture|Tomar Foto {})$'.format(getEmoji(":camera:")), 
 											self.take_picture)
 		self.dispatcher.add_handler(take_picture_handler)
+		#Audio Catch
+		audio_handler = MessageHandler(Filters.voice, self.audioHandler)
+		self.dispatcher.add_handler(audio_handler)
 		# Add conversation handler to save person name and photoFace
 		reconoce_handler = ConversationHandler(
 			entry_points=[RegexHandler('^(/reconoce|Reconoce {})$'.format(getEmoji(":bust_in_silhouette:")), 
@@ -86,6 +99,13 @@ class Bot(object):
 			except:
 			    pass
 
+	def audioHandler(self, bot, update):
+		file_id = update.message.voice.file_id
+		newFile = bot.get_file(file_id)
+		nameAudio = datetime.now().strftime('%Y%m%d%H%M%S')
+		newFile.download(self.generalConfig.Contenedor +nameAudio+'.opus')
+		threading.Thread(target=reproducirAudio(self.generalConfig.Contenedor +nameAudio+'.opus')).start()
+		
 	#Conversation - Guardar Persona
 	def reconoce(self, bot, update):
 		bot.send_message(chat_id = update.message.chat_id ,text="Primero envíame la foto de la persona (Debe ser solo de la cara)...")
