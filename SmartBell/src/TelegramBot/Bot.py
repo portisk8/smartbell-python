@@ -17,6 +17,7 @@ def getEmoji(type):
 	return emojize(type, use_aliases=True)
 
 def reproducirAudio(audioPath):
+	time.sleep(3)
 	source = oalOpen(audioPath)
 	source.play()
 	while source.get_state() == AL_PLAYING:
