@@ -1,6 +1,6 @@
 from telegram.ext import Updater
 from telegram.ext import CommandHandler, CallbackQueryHandler
-from telegram.ext import MessageHandler, Filters, ConversationHandler, RegexHandler
+from telegram.ext import MessageHandler, Filters, ConversationHandler, RegexHandler, Filters
 from telegram.error import (TelegramError, Unauthorized, BadRequest, 
                             TimedOut, ChatMigrated, NetworkError)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -32,7 +32,7 @@ class Bot(object):
 		self.camera = None
 		self.faceRecognition= None
 		#logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-		self.updater = Updater(token=self.generalConfig.Telegram.Token)
+		self.updater = Updater(token=self.generalConfig.Telegram.Token, use_context=True)
 		self.dispatcher = self.updater.dispatcher
 		self.add_handlers()
 		self.user={}
@@ -42,7 +42,7 @@ class Bot(object):
 		#Agrego los dispatcher con los que trabajará el bot
 		start_handler = CommandHandler('start', self.start)
 		self.dispatcher.add_handler(start_handler)
-		take_picture_handler = RegexHandler('^(/takepicture|Tomar Foto {})$'.format(getEmoji(":camera:")), 
+		take_picture_handler = MessageHandler(Filters.regex('^(/takepicture|Tomar Foto {})$'.format(getEmoji(":camera:"))), 
 											self.take_picture)
 		self.dispatcher.add_handler(take_picture_handler)
 		#Audio Catch
@@ -50,14 +50,14 @@ class Bot(object):
 		self.dispatcher.add_handler(audio_handler)
 		# Add conversation handler to save person name and photoFace
 		reconoce_handler = ConversationHandler(
-			entry_points=[RegexHandler('^(/reconoce|Reconoce {})$'.format(getEmoji(":bust_in_silhouette:")), 
+			entry_points=[MessageHandler(Filters.regex('^(/reconoce|Reconoce {})$'.format(getEmoji(":bust_in_silhouette:"))), 
 											self.reconoce)],
 			states={
 				"reconoceStep1": [MessageHandler(Filters.photo, self.reconoceStep1)],
 
 				"reconoceStep2": [MessageHandler(Filters.text, self.reconoceStep2)],
 
-				"reconoceStep3": [RegexHandler('^(Si|No)$', self.reconoceStep3)]
+				"reconoceStep3": [MessageHandler(Filters.regex('^(Si|No)$'), self.reconoceStep3)]
 			},
 
 			fallbacks=[CommandHandler('cancel', self.cancel)]
@@ -69,9 +69,9 @@ class Bot(object):
 		self.faceRecognition = faceRecognition
 
 
-	def start(self, bot, update):
+	def start(self, update, context):
 		print(update.message.chat_id)
-		bot.send_message(chat_id = update.message.chat_id ,text="Hola, Bienvenido/a a SmartBell. ", reply_markup= self.get_keyboard('main'))
+		context.bot.send_message(chat_id = update.effective_chat.id ,text="Hola, Bienvenido/a a SmartBell. ", reply_markup= self.get_keyboard('main'))
 		return
 
 	def send_photo(self, photoPath):
@@ -87,20 +87,21 @@ class Bot(object):
 
 	def run(self):
 		self.updater.start_polling()
+		print ("Run...")
 		return
 
 	def set_camera(self,camera):
 		self.camera = camera
 
-	def take_picture(self, bot, update):
+	def take_picture(self, update, context):
 		if(update.message.chat_id in self.generalConfig.Telegram.Admins):
 			path = self.camera.take_picture()
 			try:
-				bot.send_photo(chat_id = update.message.chat_id, photo = open(path, 'rb' ))
+				context.bot.send_photo(chat_id = update.message.chat_id, photo = open(path, 'rb' ))
 			except:
 			    pass
 
-	def audioHandler(self, bot, update):
+	def audioHandler(self, update, context):
 		file_id = update.message.voice.file_id
 		newFile = bot.get_file(file_id)
 		nameAudio = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -108,11 +109,11 @@ class Bot(object):
 		threading.Thread(target=reproducirAudio(self.generalConfig.Contenedor +nameAudio+'.opus')).start()
 		
 	#Conversation - Guardar Persona
-	def reconoce(self, bot, update):
-		bot.send_message(chat_id = update.message.chat_id ,text="Primero envíame la foto de la persona (Debe ser solo de la cara)...")
+	def reconoce(self, update, context):
+		context.bot.send_message(chat_id = update.message.chat_id ,text="Primero envíame la foto de la persona (Debe ser solo de la cara)...")
 		return "reconoceStep1"
 
-	def reconoceStep1(self, bot, update):
+	def reconoceStep1(self, update, context):
 		photo_file = update.message.photo[-1].get_file()
 		namePhoto = datetime.now().strftime('%Y%m%d%H%M%S')
 		photo_file.download(self.generalConfig.Contenedor + namePhoto + ".png")
@@ -120,12 +121,12 @@ class Bot(object):
 		update.message.reply_text('Bien! Ahora, debes ingresar el Nombre y Apellido de la persona')
 		return "reconoceStep2"
 
-	def reconoceStep2(self, bot, update):
+	def reconoceStep2(self, update, context):
 		self.user[update.message.chat_id]['nombreYApellido'] = update.message.text
 		update.message.reply_text('Genial! Ahora necesitamos tu confirmación... \nDeséa guardar ésta imagen para la persona {}?'.format(update.message.text), reply_markup=self.get_keyboard('decision'))
 		return "reconoceStep3"
 			
-	def reconoceStep3(self, bot, update):
+	def reconoceStep3(self, update, context):
 		if(update.message.text == "Si"):
 			#Logica para guardar imagen y nombre a azure
 			seGuardo = self.faceRecognition.agregar_persona(self.user[update.message.chat_id]['photoUrl'], 
@@ -134,7 +135,7 @@ class Bot(object):
 				texto = 'Se asignó correctamente la foto a {}'.format(self.user[update.message.chat_id]['nombreYApellido'])
 			else:
 				texto = 'Hubo un error al intentar asignar la foto a la persona.'
-			bot.send_message(chat_id = update.message.chat_id ,text=texto)
+			context.bot.send_message(chat_id = update.message.chat_id ,text=texto)
 		else:
 			self.user[update.message.chat_id] = None
 
@@ -149,7 +150,7 @@ class Bot(object):
 					}
 		return ReplyKeyboardMarkup(keyboard[type])
 
-	def cancel(self, bot, update):
+	def cancel(self, update, context):
 		self.user[update.message.chat_id] = None
 		update.message.reply_text('Has cancelado la operación.', reply_markup=self.get_keyboard('main'))
 		return ConversationHandler.END

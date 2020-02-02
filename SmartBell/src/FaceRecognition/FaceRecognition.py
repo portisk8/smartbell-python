@@ -9,6 +9,7 @@ class FaceRecognition(object):
 		self.PERSONGROUPID = gc.FaceConfig.GroupId
 		CF.BaseUrl.set(self.BASE_URL)
 		CF.Key.set(gc.FaceConfig.Key)
+		self.initPersonGroup()
 
 	def recognize(self,pathPicture):
 		persons=[]
@@ -76,5 +77,11 @@ class FaceRecognition(object):
 			personId = jsonData['personId']
 		return self.__agregarYentrenar(photoUrl, self.PERSONGROUPID,personId)
 
-
+	def initPersonGroup(self):
+		try:
+			existePersonGroup = CF.person_group.get(self.PERSONGROUPID)
+		except Exception as ex:
+			print (ex)
+			if (ex.status_code == 404):
+				CF.person_group.create(self.PERSONGROUPID)
 
